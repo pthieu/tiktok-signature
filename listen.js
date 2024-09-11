@@ -28,6 +28,8 @@ const PORT = process.env.PORT || 8080;
       response.setHeader("Access-Control-Allow-Origin", "*");
       response.setHeader("Access-Control-Allow-Headers", "*");
 
+      console.log(`Received: ${request.method} ${request.url}`);
+
       if (request.method === "OPTIONS") {
         response.writeHead(200);
         response.end();
@@ -41,8 +43,6 @@ const PORT = process.env.PORT || 8080;
         });
 
         request.on("end", async function () {
-          console.log("Received url: " + url);
-
           try {
             const sign = await signer.sign(url);
             const navigator = await signer.navigator();
@@ -59,13 +59,8 @@ const PORT = process.env.PORT || 8080;
             console.log(output);
           } catch (err) {
             console.log(err);
-            // Uncomment if you want to auto-exit this application when an error thrown
-            // If you use PM2 or Supervisord, it will attempt to open it
-            // var timeElapsed = new Date() - start;
-            // console.info("Execution time: %dms", timeElapsed);
-            // if (timeElapsed > 2500) {
-            //   process.exit(1);
-            // }
+            response.writeHead(500, { "Content-Type": "application/json" });
+            response.end(err.message);
           }
         });
       } else {
