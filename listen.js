@@ -15,12 +15,12 @@ const PORT = process.env.PORT || 8080;
 
     // Uncomment if you want to auto-exit this application after a period of time
     // If you use PM2 or Supervisord, it will attempt to open it
-    // setTimeout(function () {
-    //   server.close(() => {
-    //     console.log("Server shutdown completed.");
-    //     process.exit(1);
-    //   });
-    // }, 1 * 60 * 60 * 1000);
+    setTimeout(function () {
+      server.close(() => {
+        console.log("Server shutdown completed.");
+        process.exit(1);
+      });
+    }, 30 * 60 * 1000);
 
     signer.init();
 
@@ -28,7 +28,7 @@ const PORT = process.env.PORT || 8080;
       response.setHeader("Access-Control-Allow-Origin", "*");
       response.setHeader("Access-Control-Allow-Headers", "*");
 
-      console.log(`Received: ${request.method} ${request.url}`);
+      // console.log(`Received: ${request.method} ${request.url}`);
 
       if (request.method === "OPTIONS") {
         response.writeHead(200);
@@ -37,7 +37,7 @@ const PORT = process.env.PORT || 8080;
       }
 
       if (request.method === "POST" && request.url === "/signature") {
-        var url = "";
+        let url = "";
         request.on("data", function (chunk) {
           url += chunk;
         });
@@ -56,9 +56,8 @@ const PORT = process.env.PORT || 8080;
             });
             response.writeHead(200, { "Content-Type": "application/json" });
             response.end(output);
-            console.log(output);
           } catch (err) {
-            console.log(err);
+            console.error(err);
             response.writeHead(500, { "Content-Type": "application/json" });
             response.end(err.message);
           }
